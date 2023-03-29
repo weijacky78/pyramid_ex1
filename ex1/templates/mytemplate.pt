@@ -6,6 +6,12 @@
             <p class="lead">Welcome to <span class="font-normal">${project}</span>, a&nbsp;Pyramid
                 application generated&nbsp;by<br><span class="font-normal">Cookiecutter</span>.</p>
         </div>
-
+        <form action="/login" method="post">
+		<input type="hidden" name="action" value="login"> 
+		<input type="hidden" name="redirect" value="{{redirect}}"> 
+		<input type="text" name="username" placeholder="Username"> 
+		<input type="password" name="password" placeholder="Password"> 
+		<input type="submit" value="Login">
+	</form>
     </div>
 </div>
