@@ -1,0 +1,20 @@
+<html>
+<head>
+    <title>Photos</title>
+</head>
+<body>
+    <h1>Photos</h1>
+    <table>
+        
+        % for photo in photos:
+        <tr>
+            <td>${photo.id}</td>
+            <td>${photo.filename}</td>
+            <td>${photo.description}</td>
+            <td>${photo.date_modified.strftime('%Y-%m-%d %H:%M:%S')}</td>
+            <td><img src="${request.static_url('myapp:static/images/' + photo.filename)}" alt="photo"/></td>
+        </tr>
+        % endfor
+    </table>
+</body>
+</html>
