@@ -1,0 +1,15 @@
+<div class="page">
+  <h2>Add Page</h2>
+  <form method="post" action="${request.route_url('add_page')}">
+    <label for="title">Title:</label>
+    <input type="text" name="title" id="title">
+    <br>
+    <label for="key">Key:</label>
+    <input type="text" name="key" id="key">
+    <br>
+    <label for="content">Content:</label>
+    <textarea name="content" id="content"></textarea>
+    <br>
+    <input type="submit" value="Add Page">
+  </form>
+</div>

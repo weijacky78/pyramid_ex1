@@ -11,4 +11,5 @@ def includeme(config):
     config.add_route('add_photo', '/photo/add')
     config.add_route('edit_photo', '/photo/edit/{id}')
     config.add_route('delete_photo', '/photo/delete/{id}')
+    config.add_route('add_page', '/add_page')
     config.scan()

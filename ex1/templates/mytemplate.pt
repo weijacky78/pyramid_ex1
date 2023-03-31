@@ -1,16 +1,28 @@
-<div metal:use-macro="load: layout.pt">
-    <div metal:fill-slot="content">
-
-        <div class="content">
-            <h1><span class="font-semi-bold">Pyramid</span> <span class="smaller">Starter project</span></h1>
-            <p class="lead">Welcome to <span class="font-normal">${project}</span>, a&nbsp;Pyramid
-                application generated&nbsp;by<br><span class="font-normal">Cookiecutter</span>.</p>
-        </div>
-        <form action="/login" method="post">
-		<input type="hidden" name="action" value="login"> 
-		<input type="text" name="username" placeholder="Username"> 
-		<input type="password" name="password" placeholder="Password"> 
-		<input type="submit" value="Login">
-	</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{{request.static_url('EX1:static/theme.css')}}">
+</head>
+<body>
+    <header>
+        <h1>Welcome to the world of puppies</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="{{request.route_url('home')}}">Home</a></li>
+            {% if logged_in %}
+                <li><a href="{{request.route_url('add_page')}}">Add Page</a></li>
+                <li><a href="{{request.route_url('add_photo')}}">Add Photo</a></li>
+                <li><a href="{{request.route_url('logout')}}">Logout</a></li>
+            {% else %}
+                <li><a href="{{request.route_url('login')}}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <div id="content">
+        {% block content %}{% endblock %}
     </div>
-</div>
+</body>
+</html>

@@ -1,20 +1,45 @@
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Photos</title>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ request.static_url('EX1:static/theme.css') }}">
 </head>
 <body>
-    <h1>Photos</h1>
-    <table>
-        
-        % for photo in photos:
-        <tr>
-            <td>${photo.id}</td>
-            <td>${photo.filename}</td>
-            <td>${photo.description}</td>
-            <td>${photo.date_modified.strftime('%Y-%m-%d %H:%M:%S')}</td>
-            <td><img src="${request.static_url('myapp:static/images/' + photo.filename)}" alt="photo"/></td>
-        </tr>
-        % endfor
-    </table>
+    <div class="header">
+        <h1>{{ title }}</h1>
+    </div>
+    <div class="menu">
+        <ul>
+            {% for page in pages %}
+            <li><a href="{{ request.route_url('page', key=page.key) }}">{{ page.title }}</a></li>
+            {% endfor %}
+            {% if user %}
+            <li><a href="{{ request.route_url('add_photo') }}">Add Photo</a></li>
+            <li><a href="{{ request.route_url('logout') }}">Log Out</a></li>
+            {% else %}
+            <li><a href="{{ request.route_url('login') }}">Log In</a></li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="content">
+        {% if photos %}
+        <ul class="photo-list">
+            {% for photo in photos %}
+            <li>
+                <img src="{{ request.route_url('EX1:static/' + photo.filename) }}" alt="{{ photo.description }}">
+                <div class="photo-description">{{ photo.description }}</div>
+                {% if user %}
+                <div class="photo-actions">
+                    <a href="{{ request.route_url('delete_photo', id=photo.photo_id) }}">Delete</a>
+                </div>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No photos found.</p>
+        {% endif %}
+    </div>
 </body>
 </html>
+

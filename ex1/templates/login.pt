@@ -1,25 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-<body>
-    <h1>Login</h1>
-
-    <form method="post" action="${request.route_url('login')}">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-
-        <br>
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-
-        <br>
-
-        <input type="submit" value="Login">
-    </form>
-
-    <p>${message or ''}</p>
-</body>
-</html>
+<div class="page">
+  <h2>Login</h2>
+  <form method="post" action="${request.route_url('login')}">
+    <label for="username">Username:</label>
+    <input type="text" name="username" id="username">
+    <br>
+    <label for="password">Password:</label>
+    <input type="password" name="password" id="password">
+    <br>
+    <input type="submit" value="Login">
+  </form>
+</div>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Photo</title>
+    <link rel="stylesheet" type="text/css" href="{{request.static_url('myapp:static/theme.css')}}">
+</head>
+<body>
+    <header>
+        <h1>Add Photo</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="{{request.route_url('home')}}">Home</a></li>
+            <li><a href="{{request.route_url('logout')}}">Logout</a></li>
+        </ul>
+    </nav>
+    <div id="content">
+        <form action="{{request.route_url('add_photo')}}" method="post" enctype="multipart/form-data">
+            <label for="photo">Photo:</label>
+            <input type="file" id="photo" name="photo" required>
+            <br>
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" required>
+            <br>
+            <button type="submit">Add Photo</button>
+        </form>
+    </div>
+</body>
+</html>

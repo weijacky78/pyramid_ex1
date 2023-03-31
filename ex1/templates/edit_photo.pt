@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Photo</title>
+  <link rel="stylesheet" href="{{ request.static_url('app:static/theme.css') }}">
+</head>
+<body>
+  <h1>Edit Photo</h1>
+  <form method="POST" enctype="multipart/form-data">
+    <label for="filename">Filename:</label>
+    <input type="text" id="filename" name="filename" value="{{ photo.filename }}" required>
+    <br>
+    <label for="description">Description:</label>
+    <textarea id="description" name="description">{{ photo.description }}</textarea>
+    <br>
+    <label for="file">Image File:</label>
+    <input type="file" id="file" name="file">
+    <br>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="submit" value="Save">
+  </form>
+  <p><a href="{{ request.route_url('view_photo', photo_id=photo.photo_id) }}">Back to photo</a></p>
+</body>
+</html>
