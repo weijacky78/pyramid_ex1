@@ -6,29 +6,30 @@ from ..models import (
     Photo,
     User,
 )
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, sessionmaker
+import logging
 
-
-@view_config(route_name='home', renderer='templates/home.pt')
+@view_config(route_name='home', renderer='ex1:templates/home.jinja2')
 def home(request):
     engine = request.registry['sqlalchemy.engine']
-    with engine.connect() as session:
+    Session = sessionmaker(bind=engine)
+
+    with Session() as session:
         # Get all the pages from the database
         pages = session.query(Page).order_by(Page.menu_order).all()
+        # Get all the photos from the database
+        photos = session.query(Photo).all()
 
-    # Get all the photos from the database
-    photos = request.session.query(Photo).all()
-
-    # Check if the user is logged in
-    is_logged_in = False
-    username = None
-    if 'cookieHash' in request.cookies:
-        cookie_hash = request.cookies['cookieHash']
-        user = request.session.query(User).filter(
-            User.cookieHash == cookie_hash).first()
-        if user is not None:
-            is_logged_in = True
-            username = user.username
+        # Check if the user is logged in
+        is_logged_in = False
+        username = None
+        if 'cookieHash' in request.cookies:
+            cookie_hash = request.cookies['cookieHash']
+            user = session.query(User).filter(
+                User.cookieHash == cookie_hash).first()
+            if user is not None:
+                is_logged_in = True
+                username = user.username
 
     # Handle adding a new photo
     if 'form.submitted' in request.params:
@@ -50,12 +51,12 @@ def home(request):
 
         # Redirect back to the home page
         return HTTPFound(location=request.route_url('home'))
-
+     
     # Render the template with the pages, photos, and login information
     return {'pages': pages, 'photos': photos, 'is_logged_in': is_logged_in, 'username': username}
 
 
-@view_config(route_name='add_page', renderer='templates/add_page.pt', permission='edit')
+@view_config(route_name='add_page', renderer='ex1:templates/add_page.pt', permission='edit')
 def add_page(request):
     session_factory = request.registry['dbsession_factory']
     session = Session(bind=session_factory())
@@ -71,7 +72,7 @@ def add_page(request):
     return {}
 
 
-@view_config(route_name='add_photo', renderer='templates/add_photo.pt', permission='edit')
+@view_config(route_name='add_photo', renderer='ex1:templates/add_photo.pt', permission='edit')
 def add_photo(request):
     session_factory = request.registry['dbsession_factory']
     session = Session(bind=session_factory())
@@ -94,20 +95,23 @@ def delete_photo(request):
     return HTTPFound(location=request.route_url('photos'))
 
 
-@view_config(route_name='login', renderer='templates/login.pt')
+@view_config(route_name='login', renderer='ex1:templates/login.pt')
 def login(request):
-    session_factory = request.registry['dbsession_factory']
-    session = Session(bind=session_factory())
-    if request.method == 'POST':
-        username = request.params['username']
-        password = request.params['password']
-        user = session.query(User).filter_by(username=username).first()
-        if user and sha256_crypt.verify(password, user.passHash):
-            response = HTTPFound(location=request.route_url('home'))
-            response.set_cookie('username', user.cookieHash)
-            return response
-        else:
-            return HTTPUnauthorized()
+    
+    engine = request.registry['sqlalchemy.engine']
+    Session = sessionmaker(bind=engine)
+
+    with Session() as session:
+        if request.method == 'POST':
+            username = request.params['username']
+            password = request.params['password']
+            user = session.query(User).filter_by(username=username).first()
+            if user and sha256_crypt.verify(password, user.passHash):
+                response = HTTPFound(location=request.route_url('home'))
+                response.set_cookie('username', user.cookieHash)
+                return response
+            else:
+                return HTTPUnauthorized()
     return {}
 
 
