@@ -2,6 +2,7 @@ from pyramid.config import Configurator
 from pyramid.session import SignedCookieSessionFactory
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
+from sqlalchemy import create_engine
 from .models.user import User
 
 
@@ -13,6 +14,7 @@ def main(global_config, **settings):
         config.include('pyramid_chameleon')
         config.include('.routes')
         config.include('.models')
+        config.include('pyramid_jinja2')
         config.scan()
 
         my_session_factory = SignedCookieSessionFactory('my_secret_key')
@@ -25,6 +27,10 @@ def main(global_config, **settings):
         config.set_authentication_policy(authn_policy)
         config.set_authorization_policy(authz_policy)
 
+        #Create SQLAlchemy engine and adding it to the config registry
+        engine = create_engine(settings['sqlalchemy.url'])
+        config.registry['sqlalchemy.engine'] = engine
+        
         # Add a callback function to the authentication policy to retrieve user info
         def get_user(request):
             user_id = request.authenticated_userid
