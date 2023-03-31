@@ -1,0 +1,17 @@
+<div class="page">
+    <h2>Welcome to My App!</h2>
+    <p>This is the home page.</p>
+    <h3>Pages</h3>
+    <ul>
+      {% for page in pages:%}
+          <li><a href="{{request.route_url('home', page['key'])}}">{{page['title']}}</a></li>
+          {% endfor %}
+      </ul>
+    <h3>Photos</h3>
+    <ul>
+      {% for photo in photos %}
+      <li><img src="{{request.static_url('ex1:static/photos/' + photo['filename'])}}" alt="{{photo['description']}}" style="width:300px;height:300px;"></li>
+      {% endfor %}
+    </ul>
+  </div>
+  
