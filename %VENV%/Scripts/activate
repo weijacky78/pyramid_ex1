@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="D:\projects\ex1\%VENV%"
+VIRTUAL_ENV="C:\heritage2023\y22\pyramid_ex1\%VENV%"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
