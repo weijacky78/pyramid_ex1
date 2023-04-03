@@ -4,13 +4,17 @@
     <h3>Pages</h3>
     <ul>
       {% for page in pages:%}
-          <li><a href="{{request.route_url('home', page['key'])}}">{{page['title']}}</a></li>
+          <li><a href="{{request.route_url('home')}}{{page['key']}}">{{page['title']}}</a></li>
           {% endfor %}
       </ul>
     <h3>Photos</h3>
     <ul>
       {% for photo in photos %}
-      <li><img src="{{request.static_url('ex1:static/photos/' + photo['filename'])}}" alt="{{photo['description']}}" style="width:300px;height:300px;"></li>
+      {%if photo['filename']%}
+        <li><img src="{{request.static_url('ex1:static/photos/' + photo['filename'])}}" alt="{{photo['description']}}" style="width:300px;height:300px;"></li>
+      {%else%}
+        <li><img src="data:image/jpg;base64,{{ photo['photo'] }}" alt="{{photo['description']}}" style="width:300px;height:300px;"></li>
+        {% endif %}
       {% endfor %}
     </ul>
   </div>

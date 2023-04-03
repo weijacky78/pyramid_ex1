@@ -8,6 +8,7 @@ from ..models import (
 )
 from sqlalchemy.orm import Session, sessionmaker
 import logging
+from datetime import datetime
 
 @view_config(route_name='home', renderer='ex1:templates/home.jinja2')
 def home(request):
@@ -30,69 +31,63 @@ def home(request):
             if user is not None:
                 is_logged_in = True
                 username = user.username
-
-    # Handle adding a new photo
-    if 'form.submitted' in request.params:
-        # Get the uploaded photo file from the request
-        photo_file = request.POST['photo']
-
-        # Get the filename and description from the form
-        filename = request.params['filename']
-        description = request.params['description']
-
-        # Save the photo file to disk
-        with open(f"static/images/{filename}", 'wb') as f:
-            f.write(photo_file.file.read())
-
-        # Add the new photo to the database
-        photo = Photo(filename=filename, description=description)
-        request.dbsession.add(photo)
-        request.dbsession.flush()
-
-        # Redirect back to the home page
-        return HTTPFound(location=request.route_url('home'))
      
     # Render the template with the pages, photos, and login information
     return {'pages': pages, 'photos': photos, 'is_logged_in': is_logged_in, 'username': username}
 
 
-@view_config(route_name='add_page', renderer='ex1:templates/add_page.pt', permission='edit')
+@view_config(route_name='add_page', renderer='ex1:templates/add_page.pt')
 def add_page(request):
-    session_factory = request.registry['dbsession_factory']
-    session = Session(bind=session_factory())
-    if request.method == 'POST':
-        title = request.params['title']
-        content = request.params['content']
-        key = request.params['key']
-        menu_order = request.params['menu_order']
-        page = Page(title=title, content=content,
-                    key=key, menu_order=menu_order)
-        session.add(page)
-        return HTTPFound(location=request.route_url('home'))
+    engine = request.registry['sqlalchemy.engine']
+    Session = sessionmaker(bind=engine)
+
+    with Session() as session:
+        if request.method == 'POST':
+            title = request.params['title']
+            content = request.params['content']
+            key = request.params['key']
+            menu_order = request.params['menu_order']
+            page = Page(title=title, content=content,
+                        key=key, menu_order=menu_order)
+            session.add(page)
+            return HTTPFound(location=request.route_url('home'))
     return {}
 
-
-@view_config(route_name='add_photo', renderer='ex1:templates/add_photo.pt', permission='edit')
+@view_config(route_name='add_photo', renderer='ex1:templates/add_photo.jinja2')
 def add_photo(request):
-    session_factory = request.registry['dbsession_factory']
-    session = Session(bind=session_factory())
-    if request.method == 'POST':
-        filename = request.params['filename']
-        description = request.params['description']
-        photo = Photo(filename=filename, description=description)
-        session.add(photo)
-        return HTTPFound(location=request.route_url('photos'))
+    logger = logging.getLogger()
+    logger.info("Adding NEW Photo")
+    engine = request.registry['sqlalchemy.engine']
+    Session = sessionmaker(bind=engine)
+
+    with Session() as session:
+        if request.method == 'POST':
+            picture = request.params['photo']
+            description = request.params['description']
+            
+            photo = Photo()
+            photo.photo= picture.file.read()
+            photo.description=description
+            photo.date_modified = datetime.now()
+            
+            session.add(photo)
+            session.commit()
+            return HTTPFound(location=request.route_url('home'))
     return {}
 
 
-@view_config(route_name='delete_photo', permission='edit')
+@view_config(route_name='delete_photo')
 def delete_photo(request):
-    session_factory = request.registry['dbsession_factory']
-    session = Session(bind=session_factory())
-    photo_id = request.matchdict['photo_id']
-    photo = session.query(Photo).filter_by(photo_id=photo_id).one()
-    session.delete(photo)
-    return HTTPFound(location=request.route_url('photos'))
+    print("Deleting photo")
+    engine = request.registry['sqlalchemy.engine']
+    Session = sessionmaker(bind=engine)
+
+    with Session() as session:
+        photo_id = request.matchdict['photo_id']
+        photo = session.query(Photo).filter_by(photo_id=photo_id).one()
+        session.delete(photo)
+        return HTTPFound(location=request.route_url('photos'))
+    
 
 
 @view_config(route_name='login', renderer='ex1:templates/login.pt')
@@ -106,9 +101,9 @@ def login(request):
             username = request.params['username']
             password = request.params['password']
             user = session.query(User).filter_by(username=username).first()
-            if user and sha256_crypt.verify(password, user.passHash):
+            if user and password == user.passHash:
                 response = HTTPFound(location=request.route_url('home'))
-                response.set_cookie('username', user.cookieHash)
+                response.set_cookie('username', user.username)
                 return response
             else:
                 return HTTPUnauthorized()

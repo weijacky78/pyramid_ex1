@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Add Photo</title>
-    <link rel="stylesheet" type="text/css" href="{{request.static_url('myapp:static/theme.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{request.static_url('ex1:static/theme.css')}}">
 </head>
 <body>
     <header>
@@ -16,7 +16,7 @@
         </ul>
     </nav>
     <div id="content">
-        <form action="{{request.route_url('add_photo')}}" method="post" enctype="multipart/form-data">
+        <form action="/photo/add" method="post" enctype="multipart/form-data">
             <label for="photo">Photo:</label>
             <input type="file" id="photo" name="photo" required>
             <br>
